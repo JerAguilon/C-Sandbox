@@ -10,7 +10,13 @@ using namespace std;
 
 class Vector {
     public:
-        Vector(int s) :elem{new double[s]}, sz{s} { }
+        Vector(int s) { 
+            if (s < 0) {
+                throw length_error("Arg 0 must be greater than 0");
+            }
+            elem = new double[s];
+            sz = s;
+        }
         double& operator[](int i){ return elem[i]; }
         int size() { return sz; }
     private:
@@ -26,7 +32,7 @@ int main() {
 }
 
 double read_and_sum(int s) {
-    Vector v(s);
+    Vector v{s};
     for (int i = 0; i < s; i++) {
         cin >> v[i];
     }
