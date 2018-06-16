@@ -21,7 +21,6 @@ class Vector {
 double read_and_sum(int);
 
 int main() {
-    cout << "Hello World\n";
     cout << read_and_sum(6);
     return 0;
 }
