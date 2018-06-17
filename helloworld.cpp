@@ -17,6 +17,7 @@ class Vector {
             elem = new double[s];
             sz = s;
         }
+        ~Vector() { delete[] elem; };
         double& operator[](int i){ return elem[i]; }
         int size() { return sz; }
     private:
