@@ -4,7 +4,7 @@
 using std::vector;
 using std::cout;
 
-#define LEN 100
+#define LEN 10
 
 enum class Direction {
     LEFT, RIGHT, UP, DOWN
