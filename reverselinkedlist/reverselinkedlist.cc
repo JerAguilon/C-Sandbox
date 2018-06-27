@@ -3,6 +3,7 @@ struct LinkedListNode {
         LinkedListNode* next;
 };
 
+// Runtime: O(n), Space: O(n)
 LinkedListNode* reverse_recursive(
         LinkedListNode* head) {
     if (head == nullptr || head->next==nullptr) return head;
@@ -12,6 +13,7 @@ LinkedListNode* reverse_recursive(
     return newHead;
 }
 
+// Runtime: O(n), Space: O(1)
 LinkedListNode* reverse_iterative(LinkedListNode* head) {
     if (head == nullptr || head->next == nullptr) return head;
 
