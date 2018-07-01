@@ -24,7 +24,6 @@ int partition(int arr[], int low, int high) {
         while(arr[right] > pivot_val && right > low) right--;
         if (left < right) {
             swap(arr[left], arr[right]);
-            left++, right--;
         } else {
             break;
         }
