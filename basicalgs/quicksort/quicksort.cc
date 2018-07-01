@@ -10,6 +10,9 @@ int partition(int arr[], int low, int high) {
     int right = high;
 
     /**
+     * Overall the goal is to make right at the correct pivot point. We use the
+     * following rules:
+     *
      * 1.  The left pointer should be able to range from [low + 1, high]
      * 2.  The right pointer should be able to range from [low, high]
      * 2a. The right pointer ending up at low indicates that the pivot is lower
@@ -24,6 +27,7 @@ int partition(int arr[], int low, int high) {
         while(arr[right] > pivot_val && right > low) right--;
         if (left < right) {
             swap(arr[left], arr[right]);
+            left++, right--;
         } else {
             break;
         }
