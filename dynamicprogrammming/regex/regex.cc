@@ -7,41 +7,48 @@ using namespace std;
 
 int increment(const string& pattern, int pi) {
     int candidate = pi + 1;
-    if (candidate + 1 < pattern.length() && pattern[candidate + 1] == '*') {
+    if (pattern[candidate + 1] == '*') {
         candidate++;
     }
     return candidate;
 }
 
 bool matches(const string& text, const string& pattern, int ti, int pi) {
-    char curr_p = text[pi];
+    char curr_p = pattern[pi];
     if (curr_p == '*') {
-        return matches(text, pattern, ti, pi - 1); 
+        return ti > text.length() - 1 || matches(text, pattern, ti, pi - 1); // matches empty string and previous char
     }
     return pattern[pi] == '.' || text[ti] == pattern[pi];
 }
 
 bool helper(const string& text, const string& pattern, int ti, int pi) {
-    /**
-     * Special case: if curr char is *, then handle this separately
-     */
     char p_curr = pattern[pi];
-    if (p_curr == '*') {
-        if (matches(text, pattern, ti, pi)) {
-            return helper(text, pattern, ti + 1, increment(pattern, pi)) || helper(text, pattern, ti + 1, pi);
-        } else {
-            return helper(text, pattern, ti + 1, increment(pattern, pi));
-        }
+    char t_curr = text[ti];
+
+    if (pi == pattern.length() && ti == text.length()) {
+        return true;
+    }
+    if (pi == pattern.length() && ti < text.length()) {
+        return false;
     }
 
     /**
-     * Base case 1: if we've hit the end of the pattern, then check for one final
-     * match
-     *
-     * Base case 2: if there isn't a match, then return false
+     * Special case: if curr char is *, then handle this separately
      */
-    if (pi == pattern.length() - 1) {
-        return matches(text, pattern, ti, pi);
+    if (p_curr == '*') {
+        if (ti == text.length() && pi == pattern.length() - 1) {
+            return true;
+        } else if (ti == text.length()) {
+            return false;
+        } else if (matches(text, pattern, ti, pi)) {
+            return helper(text, pattern, ti + 1, increment(pattern, pi)) || helper(text, pattern, ti + 1, pi);
+        } else {
+            return false;
+        }
+    }
+
+    if (pi == pattern.length() || ti == text.length()) {
+        return false;
     }
 
     if (!matches(text, pattern, ti, pi)) {
@@ -55,7 +62,7 @@ bool helper(const string& text, const string& pattern, int ti, int pi) {
 }
 
 bool regex_match(const string& text, const string& pattern) {
-    return helper(text, pattern, 0, 0);
+    return helper(text, pattern, 0, increment(pattern, -1));
 }
 
 void test(const string& text, const string& pattern) {
@@ -77,6 +84,7 @@ void test(const string& text, const string& pattern) {
 int main(int argc, char* argv[]) {
     test("abb", "abb");
     test("a", "ab*");
+    test("aaabbbbb", "a*");
     test("aaabbbbbcccd", "a*bbb*.*d");
     test("a", "ab*");
     test("aaabbbbbcccd", "a*bbb*.*d");
