@@ -36,12 +36,19 @@ bool helper(const string& text, const string& pattern, int ti, int pi) {
 
 
     /**
-     * Special case: if curr char is *, then handle this separately
+     * Special case: if curr char is *, then handle this separately. Note that
+     * we already know that the * selector matches from above.
+     * 
+     * We can do three things here:
+     * 1. Advance ti and continue checking for the * selector
+     * 2. Advance pi and attempt to match the next character
+     * 3. Advance pi and ti and attempt to matc the next character
+     * 
      */
     if (p_curr == '*') {
             return helper(text, pattern, ti, increment_pattern(pattern, pi)) 
-                || helper(text, pattern,  ti + 1, pi)
-                || helper(text, pattern, ti + 1, increment_pattern(pattern, pi));
+                || helper(text, pattern, ti + 1, increment_pattern(pattern, pi))
+                || helper(text, pattern, ti + 1, pi);
     }
 
     /**
