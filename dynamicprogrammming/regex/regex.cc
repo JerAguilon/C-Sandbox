@@ -2,10 +2,11 @@
 #include<iostream>
 #include<regex>
 #include<assert.h>
+#include<algorithm>
 
 using namespace std;
 
-int increment(const string& pattern, int pi) {
+int increment_pattern(const string& pattern, int pi) {
     int candidate = pi + 1;
     if (pattern[candidate + 1] == '*') {
         candidate++;
@@ -16,7 +17,8 @@ int increment(const string& pattern, int pi) {
 bool matches(const string& text, const string& pattern, int ti, int pi) {
     char curr_p = pattern[pi];
     if (curr_p == '*') {
-        return ti > text.length() - 1 || matches(text, pattern, ti, pi - 1); // matches empty string and previous char
+        // matches empty string and previous char
+        return (ti == static_cast<int>(text.length())) || matches(text, pattern, ti, pi - 1);
     }
     return pattern[pi] == '.' || text[ti] == pattern[pi];
 }
@@ -28,41 +30,28 @@ bool helper(const string& text, const string& pattern, int ti, int pi) {
     if (pi == pattern.length() && ti == text.length()) {
         return true;
     }
-    if (pi == pattern.length() && ti < text.length()) {
+    if (!matches(text, pattern, ti, pi) || ti > text.length()) {
         return false;
     }
+
 
     /**
      * Special case: if curr char is *, then handle this separately
      */
     if (p_curr == '*') {
-        if (ti == text.length() && pi == pattern.length() - 1) {
-            return true;
-        } else if (ti == text.length()) {
-            return false;
-        } else if (matches(text, pattern, ti, pi)) {
-            return helper(text, pattern, ti + 1, increment(pattern, pi)) || helper(text, pattern, ti + 1, pi);
-        } else {
-            return false;
-        }
-    }
-
-    if (pi == pattern.length() || ti == text.length()) {
-        return false;
-    }
-
-    if (!matches(text, pattern, ti, pi)) {
-        return false;
+            return helper(text, pattern, ti, increment_pattern(pattern, pi)) 
+                || helper(text, pattern,  ti + 1, pi)
+                || helper(text, pattern, ti + 1, increment_pattern(pattern, pi));
     }
 
     /**
      * Recurse case 1: Advance ti and pi
      */
-    return helper(text, pattern, ti + 1, increment(pattern, pi));
+    return helper(text, pattern, ti + 1, increment_pattern(pattern, pi));
 }
 
 bool regex_match(const string& text, const string& pattern) {
-    return helper(text, pattern, 0, increment(pattern, -1));
+    return helper(text, pattern, 0, increment_pattern(pattern, -1));
 }
 
 void test(const string& text, const string& pattern) {
@@ -85,8 +74,6 @@ int main(int argc, char* argv[]) {
     test("abb", "abb");
     test("a", "ab*");
     test("aaabbbbb", "a*");
-    test("aaabbbbbcccd", "a*bbb*.*d");
-    test("a", "ab*");
     test("aaabbbbbcccd", "a*bbb*.*d");
     test("aaabbbbbcccde", "a*bbb*.*d");
     test("aaabbbbbcccde", "a*bbb*c*d");
