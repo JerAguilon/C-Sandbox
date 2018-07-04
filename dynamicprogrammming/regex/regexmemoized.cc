@@ -1,8 +1,10 @@
-#include<string>
+#include<algorithm>
+#include<assert.h>
 #include<iostream>
 #include<regex>
-#include<assert.h>
-#include<algorithm>
+#include<string>
+#include<unordered_map>
+#include<tuple>
 
 using namespace std;
 
@@ -57,7 +59,10 @@ bool helper(const string& text, const string& pattern, int ti, int pi) {
     return helper(text, pattern, ti + 1, increment_pattern(pattern, pi));
 }
 
+
+typedef tuple<int, int, int, int> key;
 bool regex_match(const string& text, const string& pattern) {
+    unordered_map<key, int> memoize;
     return helper(text, pattern, 0, increment_pattern(pattern, -1));
 }
 
