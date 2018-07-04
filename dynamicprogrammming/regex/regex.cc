@@ -42,7 +42,7 @@ bool helper(const string& text, const string& pattern, int ti, int pi) {
      * We can do three things here:
      * 1. Advance ti and continue checking for the * selector
      * 2. Advance pi and attempt to match the next character
-     * 3. Advance pi and ti and attempt to matc the next character
+     * 3. Advance pi and ti and attempt to match the next character
      * 
      */
     if (p_curr == '*') {
