@@ -1,4 +1,5 @@
 #include<algorithm>
+#include<utility>
 #include<assert.h>
 #include<iostream>
 #include<regex>
@@ -7,6 +8,16 @@
 #include<tuple>
 
 using namespace std;
+
+using Key = std::pair<int, int>;
+
+struct KeyHash {
+    static_assert(sizeof(int) * 2 == sizeof(size_t));
+
+    size_t operator()(Key p) const noexcept {
+        return size_t(p.first) << 32 | p.second;
+    }
+};
 
 int increment_pattern(const string& pattern, int pi) {
     int candidate = pi + 1;
@@ -25,14 +36,23 @@ bool matches(const string& text, const string& pattern, int ti, int pi) {
     return pattern[pi] == '.' || text[ti] == pattern[pi];
 }
 
-bool helper(const string& text, const string& pattern, int ti, int pi) {
-    char p_curr = pattern[pi];
-    char t_curr = text[ti];
+bool helper(const string& text, const string& pattern, int ti, int pi, unordered_map<Key, bool, KeyHash>& m) {
+    Key key = make_pair(ti, pi);
+    auto lookup = m.find(key);
+    if (lookup != m.end()) {
+        return lookup->second;
+    }
 
+    auto p_curr = pattern[pi];
+    auto t_curr = text[ti];
+    
     if (pi == pattern.length() && ti == text.length()) {
+        m.insert(make_pair(key, true));
         return true;
     }
+
     if (!matches(text, pattern, ti, pi) || ti > text.length()) {
+        m.insert(make_pair(key, false));
         return false;
     }
 
@@ -47,23 +67,24 @@ bool helper(const string& text, const string& pattern, int ti, int pi) {
      * 3. Advance pi and ti and attempt to match the next character
      * 
      */
+    auto result = false;
     if (p_curr == '*') {
-            return helper(text, pattern, ti, increment_pattern(pattern, pi)) 
-                || helper(text, pattern, ti + 1, increment_pattern(pattern, pi))
-                || helper(text, pattern, ti + 1, pi);
+            result =  helper(text, pattern, ti, increment_pattern(pattern, pi), m) 
+                || helper(text, pattern, ti + 1, increment_pattern(pattern, pi), m)
+                || helper(text, pattern, ti + 1, pi, m);
+    } else {
+        /**
+         * Recurse case 1: Advance ti and pi
+         */
+        result = helper(text, pattern, ti + 1, increment_pattern(pattern, pi), m);
     }
-
-    /**
-     * Recurse case 1: Advance ti and pi
-     */
-    return helper(text, pattern, ti + 1, increment_pattern(pattern, pi));
+    m.insert(make_pair(key, result));
+    return result;
 }
 
-
-typedef tuple<int, int, int, int> key;
 bool regex_match(const string& text, const string& pattern) {
-    unordered_map<key, int> memoize;
-    return helper(text, pattern, 0, increment_pattern(pattern, -1));
+    unordered_map<Key, bool, KeyHash> memoize;
+    return helper(text, pattern, 0, increment_pattern(pattern, -1), memoize);
 }
 
 void test(const string& text, const string& pattern) {
