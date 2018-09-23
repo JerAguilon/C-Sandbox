@@ -33,7 +33,7 @@ bool does_match(vector<string> tokens, string str, int i, int j, cache c) {
     string curr_token = tokens[i];
     if (j == str.length()) {
         if (curr_token.length() == 2) {
-            auto result = does_match(tokens, str, i, j + 1, c);
+            auto result = does_match(tokens, str, i + 1, j, c);
             c[i][j] = result;
             return result;
         } else {
@@ -70,6 +70,7 @@ vector<string> tokenize(string pattern) {
         i += 1;
         if (i < pattern.length() && pattern[i] == '*') {
             curr.push_back(pattern[i]);
+            i += 1;
         }
         output.push_back(curr);
     }
@@ -84,6 +85,10 @@ bool Solution::solve(string pattern, string str) {
 
 int main() {
     Solution s;
-    assert(s.solve("a*", "") == false);
-    assert(s.solve("a*", "aaaaaa") == false);
+    assert(s.solve("a*", "") == true);
+    assert(s.solve("a*", "aaaaaa") == true);
+    assert(s.solve("ca*b", "caaaaaab") == true);
+    assert(s.solve("ca*", "caaaaaab") == false);
+    assert(s.solve("ca*b*", "caaaaaa") == true);
+    cout << "all tests passed :)" << endl;
 }
